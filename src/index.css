@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body { background: #08090a; color: #e7ecee; }
+body { font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+@layer components {
+  .card { @apply rounded-2xl border border-line bg-panel; }
+  .label { @apply font-mono text-[10px] uppercase tracking-[0.18em] text-muted; }
+  .input { @apply w-full rounded-xl border border-line bg-panel2 px-3 py-2.5 text-sm text-white outline-none transition focus:border-win/60; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition; }
+  .btn-primary { @apply btn bg-white text-black hover:bg-white/90; }
+  .btn-ghost { @apply btn border border-line text-soft hover:border-soft/40 hover:text-white; }
+}
+
+.glow-win { box-shadow: 0 0 0 1px rgba(126,226,168,.15), 0 30px 80px -30px rgba(126,226,168,.35); }
+.glow-loss { box-shadow: 0 0 0 1px rgba(242,118,107,.15), 0 30px 80px -30px rgba(242,118,107,.35); }
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
