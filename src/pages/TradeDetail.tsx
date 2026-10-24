@@ -15,7 +15,7 @@ export default function TradeDetail() {
   if (!t) return <Empty>Trade not found. <Link to="/trades" className="underline">Back to trades</Link></Empty>
   const r = rOf(t)
   const win = r > 0
-  const color = win ? '#7ee2a8' : '#f2766b'
+  const color = win ? '#6ee7b7' : '#ff8a7a'
   const accNames = t.accountIds.map(a => accounts.find(x => x.id === a)?.name ?? '—').join(', ')
   // How it went: entry → worst point → best point → exit (order depends on outcome)
   const mae = t.maeR ?? Math.min(0, r), mfe = t.mfeR ?? Math.max(0, r)
@@ -34,7 +34,7 @@ export default function TradeDetail() {
       </div>
 
       <section className={`card relative overflow-hidden p-6 md:p-8 ${win ? 'glow-win' : 'glow-loss'}`}
-        style={{ background: `radial-gradient(120% 140% at 0% 0%, ${win ? 'rgba(126,226,168,.10)' : 'rgba(242,118,107,.12)'}, #0f1112 60%)` }}>
+        style={{ background: `radial-gradient(120% 140% at 0% 0%, ${win ? 'rgba(110,231,183,.10)' : 'rgba(255,138,122,.12)'}, rgba(255,255,255,0.05) 60%)` }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${t.side === 'long' ? 'bg-win/15 text-win' : 'bg-loss/15 text-loss'}`}>{t.side === 'long' ? '▲ LONG' : '▼ SHORT'}</span>
@@ -44,7 +44,7 @@ export default function TradeDetail() {
           <span className="font-mono text-xs text-muted">{d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {fmtTime(t.date)}</span>
         </div>
         <div className={`label mt-4 ${win ? 'text-win' : 'text-loss'}`}>{win ? 'Win' : r < 0 ? 'Loss' : 'Breakeven'}</div>
-        <div className="font-mono text-6xl font-extrabold tracking-tight md:text-7xl" style={{ color }}>{fmtR(r)}</div>
+        <div className="font-mono text-6xl font-light tracking-tight md:text-7xl" style={{ color }}>{fmtR(r)}</div>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
           <div className="text-sm text-soft"><span className="font-mono font-bold">{fmtUsd(pnlOf(t))}</span> <span className="text-muted">{accNames} · {t.session}</span></div>
           <div className={`rounded-xl border px-3 py-1.5 text-center ${t.clean ? 'border-win/40 bg-win/10 text-win' : 'border-loss/40 bg-loss/10 text-loss'}`}>
@@ -60,11 +60,11 @@ export default function TradeDetail() {
           <ResponsiveContainer>
             <AreaChart data={data} margin={{ left: -15, right: 10, top: 10, bottom: 0 }}>
               <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={0.3} /><stop offset="100%" stopColor={color} stopOpacity={0} /></linearGradient></defs>
-              <XAxis dataKey="label" tick={{ fill: '#6b7479', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#6b7479', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${(+v).toFixed(1)}R`} domain={[Math.min(-1, ...path) - 0.2, Math.max(1, ...path) + 0.2]} />
-              <ReferenceLine y={0} stroke="#2a3034" />
-              <ReferenceLine y={-1} stroke="#f2766b" strokeDasharray="4 4" strokeOpacity={0.5} label={{ value: 'stop', fill: '#f2766b', fontSize: 10, position: 'insideLeft' }} />
-              <Area isAnimationActive={false} type="linear" dataKey="v" stroke={color} strokeWidth={2.5} fill="url(#rg)" dot={{ r: 4, fill: '#0f1112', stroke: color, strokeWidth: 2 }} />
+              <XAxis dataKey="label" tick={{ fill: '#8b95a7', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#8b95a7', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${(+v).toFixed(1)}R`} domain={[Math.min(-1, ...path) - 0.2, Math.max(1, ...path) + 0.2]} />
+              <ReferenceLine y={0} stroke="#ffffff2e" />
+              <ReferenceLine y={-1} stroke="#ff8a7a" strokeDasharray="4 4" strokeOpacity={0.5} label={{ value: 'stop', fill: '#ff8a7a', fontSize: 10, position: 'insideLeft' }} />
+              <Area isAnimationActive={false} type="linear" dataKey="v" stroke={color} strokeWidth={2.5} fill="url(#rg)" dot={{ r: 4, fill: '#1b2232', stroke: color, strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>

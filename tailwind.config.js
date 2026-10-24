@@ -4,19 +4,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: '#08090a',
-        panel: '#0f1112',
-        panel2: '#15181a',
-        line: '#1f2427',
-        muted: '#6b7479',
-        soft: '#9aa3a8',
-        win: '#7ee2a8',
-        loss: '#f2766b',
-        warn: '#e8c56b',
+        // Glass theme: surfaces are translucent white over a dark, glowing backdrop.
+        bg: '#0b0f17',
+        panel: 'rgba(255,255,255,0.055)',
+        panel2: 'rgba(255,255,255,0.07)',
+        line: 'rgba(255,255,255,0.12)',
+        muted: '#8b95a7',
+        soft: '#c3cad6',
+        win: '#6ee7b7',
+        loss: '#ff8a7a',
+        warn: '#ffb35c',
+        accent: '#5b8cff',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        mono: ['Outfit', 'system-ui', 'sans-serif'],
       },
     },
   },

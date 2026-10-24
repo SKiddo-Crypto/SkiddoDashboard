@@ -55,7 +55,7 @@ export default function Trades() {
           <section key={monday}>
             <div className="label mb-2">Week of {short(m)}</div>
             <div className="card divide-y divide-line overflow-hidden">
-              <div className="flex items-center justify-between bg-panel2/50 px-4 py-3">
+              <div className="flex items-center justify-between bg-panel2 px-4 py-3">
                 <span className="text-sm font-semibold">The week · {short(m)} – {short(sun)}</span>
                 <span className="font-mono text-xs text-soft">{s.count} trades · <span className={tone(s.netR)}>{fmtR(s.netR)}</span> · <span className={tone(s.netUsd)}>{fmtUsd(s.netUsd)}</span></span>
               </div>
@@ -63,14 +63,14 @@ export default function Trades() {
                 const ds = computeStats(ts); const isOpen = open === k
                 return (
                   <div key={k}>
-                    <button onClick={() => setOpen(isOpen ? null : k)} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-panel2/40">
+                    <button onClick={() => setOpen(isOpen ? null : k)} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-panel2">
                       <span className="w-28 text-sm">{new Date(k + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
                       <span className="hidden flex-1 gap-1 sm:flex">{ts.map(t => <span key={t.id} className={`h-2 w-2 rounded-full ${rOf(t) > 0 ? 'bg-win' : 'bg-loss'}`} />)}</span>
                       <span className="ml-auto font-mono text-xs text-soft">{ds.count} trade{ds.count > 1 ? 's' : ''} · <span className={tone(ds.netR)}>{fmtR(ds.netR)}</span></span>
                       <ChevronDown size={14} className={`text-muted transition ${isOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {isOpen && (
-                      <div className="bg-bg/60 px-2 pb-2">
+                      <div className="bg-white/[0.02] px-2 pb-2">
                         {[...ts].sort((a, b) => a.date.localeCompare(b.date)).map(t => <TradeRow key={t.id} t={t} />)}
                       </div>
                     )}

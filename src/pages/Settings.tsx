@@ -64,7 +64,7 @@ function AccountRow({ a, onChange, onDelete }: { a: Account; onChange: (a: Accou
     </label>
   )
   return (
-    <div className="rounded-xl border border-line bg-panel2/40 p-4">
+    <div className="rounded-xl border border-line bg-panel2 p-4">
       <div className="grid gap-3 sm:grid-cols-[1.4fr_1fr_auto]">
         {f('name', 'Name', 'text')}
         <label className="block">

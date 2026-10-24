@@ -3,18 +3,47 @@
 @tailwind utilities;
 
 :root { color-scheme: dark; }
-html, body { background: #08090a; color: #e7ecee; }
-body { font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+html { background-color: #0b0f17; }
+body { background: transparent; color: #eef2f8; }
+body {
+  font-family: Outfit, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+/* Soft colour glows behind the glass. Fixed so panels blur them as you scroll. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -10%;
+  z-index: -1;
+  background:
+    radial-gradient(45% 40% at 15% 5%, rgba(91, 140, 255, 0.7), transparent 70%),
+    radial-gradient(40% 45% at 95% 25%, rgba(255, 159, 67, 0.45), transparent 70%),
+    radial-gradient(50% 45% at 65% 100%, rgba(110, 231, 183, 0.35), transparent 70%),
+    radial-gradient(45% 45% at 0% 80%, rgba(168, 120, 255, 0.45), transparent 70%),
+    linear-gradient(160deg, #101827 0%, #0b0f17 55%, #120f1a 100%);
+  filter: saturate(115%);
+  animation: drift 40s ease-in-out infinite alternate;
+}
+@keyframes drift { to { transform: translate3d(2%, -2%, 0) scale(1.05); } }
+@media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
+
+.font-mono { font-variant-numeric: tabular-nums; }
 
 @layer components {
-  .card { @apply rounded-2xl border border-line bg-panel; }
-  .label { @apply font-mono text-[10px] uppercase tracking-[0.18em] text-muted; }
-  .input { @apply w-full rounded-xl border border-line bg-panel2 px-3 py-2.5 text-sm text-white outline-none transition focus:border-win/60; }
+  .glass {
+    @apply border border-white/[0.14] bg-white/[0.07] backdrop-blur-2xl;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 20px 50px -20px rgba(0,0,0,0.55);
+  }
+  .card { @apply glass rounded-3xl; }
+  .label { @apply text-[11px] font-medium uppercase tracking-[0.14em] text-muted; }
+  .input { @apply w-full rounded-2xl border border-white/10 bg-white/[0.06] px-3.5 py-2.5 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-muted focus:border-accent/70 focus:bg-white/[0.09]; }
   .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition; }
-  .btn-primary { @apply btn bg-white text-black hover:bg-white/90; }
-  .btn-ghost { @apply btn border border-line text-soft hover:border-soft/40 hover:text-white; }
+  .btn-primary { @apply btn bg-white text-[#0b0f17] shadow-[0_8px_30px_-8px_rgba(255,255,255,0.5)] hover:bg-white/90; }
+  .btn-ghost { @apply btn border border-white/15 bg-white/[0.06] text-soft backdrop-blur-xl hover:bg-white/[0.12] hover:text-white; }
 }
 
-.glow-win { box-shadow: 0 0 0 1px rgba(126,226,168,.15), 0 30px 80px -30px rgba(126,226,168,.35); }
-.glow-loss { box-shadow: 0 0 0 1px rgba(242,118,107,.15), 0 30px 80px -30px rgba(242,118,107,.35); }
+select.input option { background: #141a26; }
+.glow-win { box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 30px 80px -30px rgba(110,231,183,.45); }
+.glow-loss { box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 30px 80px -30px rgba(255,138,122,.45); }
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }

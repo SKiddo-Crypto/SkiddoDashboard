@@ -89,7 +89,7 @@ export default function Simulator() {
             // share of replays that hit the drawdown floor at any point
             const blown = s ? s.paths.filter(p => p.some(v => g.balance + v <= g.floor)).length / s.paths.length : 0
             return (
-              <div key={a.id} className="rounded-xl border border-line bg-panel2/50 p-4">
+              <div key={a.id} className="rounded-xl border border-line bg-panel2 p-4">
                 <div className="text-sm font-semibold">{a.name} <span className="font-normal text-muted">· {a.exchange}</span></div>
                 {s ? (
                   <div className="mt-3 grid grid-cols-3 gap-2 font-mono">
@@ -112,7 +112,7 @@ function Tile({ label, v, sub, n }: { label: string; v: string; sub: string; n?:
   return (
     <div className="card p-4">
       <div className="text-[11px] text-muted">{label}</div>
-      <div className={`mt-1 font-mono text-xl font-bold ${n === undefined ? '' : tone(n)}`}>{v}</div>
+      <div className={`mt-1 font-mono text-xl font-medium ${n === undefined ? '' : tone(n)}`}>{v}</div>
       <div className="text-[10px] text-muted">{sub}</div>
     </div>
   )
@@ -131,10 +131,10 @@ function Paths({ paths, median }: { paths: number[][]; median: number }) {
   const d = (p: number[]) => p.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="h-72 w-full md:h-80" preserveAspectRatio="none">
-      <line x1="0" x2={W} y1={y(0)} y2={y(0)} stroke="#2a3034" strokeDasharray="4 4" />
-      {shown.map((p, i) => <path key={i} d={d(p)} fill="none" stroke={p[n] >= 0 ? '#c9d3d8' : '#f2766b'} strokeOpacity={0.09} strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
-      <path d={d(mid)} fill="none" stroke="#7ee2a8" strokeWidth="2.5" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px #7ee2a8)' }} />
-      <circle cx={x(n)} cy={y(mid[n])} r="5" fill="#7ee2a8" />
+      <line x1="0" x2={W} y1={y(0)} y2={y(0)} stroke="#ffffff2e" strokeDasharray="4 4" />
+      {shown.map((p, i) => <path key={i} d={d(p)} fill="none" stroke={p[n] >= 0 ? '#c9d3d8' : '#ff8a7a'} strokeOpacity={0.09} strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
+      <path d={d(mid)} fill="none" stroke="#6ee7b7" strokeWidth="2.5" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px #6ee7b7)' }} />
+      <circle cx={x(n)} cy={y(mid[n])} r="5" fill="#6ee7b7" />
     </svg>
   )
 }

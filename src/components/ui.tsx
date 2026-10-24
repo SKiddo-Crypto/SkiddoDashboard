@@ -17,9 +17,9 @@ export function Card({ children, className = '', title, right }: { children: Rea
 
 export function Stat({ label, value, sub, n, className = '' }: { label: string; value: ReactNode; sub?: ReactNode; n?: number; className?: string }) {
   return (
-    <div className={`rounded-xl border border-line bg-panel2/60 p-3.5 ${className}`}>
+    <div className={`rounded-2xl border border-white/10 bg-white/[0.05] p-3.5 ${className}`}>
       <div className="text-[11px] text-muted">{label}</div>
-      <div className={`mt-1 font-mono text-lg font-bold ${n === undefined ? 'text-white' : tone(n)}`}>{value}</div>
+      <div className={`mt-1 font-mono text-lg font-medium ${n === undefined ? 'text-white' : tone(n)}`}>{value}</div>
       {sub && <div className="mt-0.5 text-[11px] text-muted">{sub}</div>}
     </div>
   )
@@ -32,14 +32,14 @@ export function Segmented<T extends string>({ value, options, onChange, colors }
   colors?: Partial<Record<T, string>>
 }) {
   return (
-    <div className="grid gap-1 rounded-xl bg-panel2 p-1" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0,1fr))` }}>
+    <div className="grid gap-1 rounded-2xl border border-white/10 bg-white/[0.05] p-1 backdrop-blur-xl" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0,1fr))` }}>
       {options.map(o => (
         <button
           key={o.value}
           type="button"
           onClick={() => onChange(o.value)}
-          className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-            value === o.value ? colors?.[o.value] ?? 'bg-win text-black' : 'text-soft hover:text-white'
+          className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
+            value === o.value ? colors?.[o.value] ?? 'bg-white text-[#0b0f17] shadow-[0_4px_20px_-6px_rgba(255,255,255,0.6)]' : 'text-soft hover:text-white'
           }`}
         >
           {o.label}
@@ -66,8 +66,8 @@ export function Chip({ active, children, onClick }: { active?: boolean; children
 export function Bar({ value, max, positive }: { value: number; max: number; positive: boolean }) {
   const w = max > 0 ? Math.max(4, (Math.abs(value) / max) * 100) : 0
   return (
-    <div className="h-2 w-full rounded-full bg-panel2">
-      <div className={`h-2 rounded-full ${positive ? 'bg-win/80' : 'bg-loss/80'}`} style={{ width: `${w}%` }} />
+    <div className="h-1.5 w-full rounded-full bg-white/[0.07]">
+      <div className={`h-1.5 rounded-full ${positive ? 'bg-gradient-to-r from-accent to-win' : 'bg-gradient-to-r from-warn to-loss'}`} style={{ width: `${w}%` }} />
     </div>
   )
 }

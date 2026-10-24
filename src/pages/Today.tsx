@@ -28,7 +28,7 @@ export default function Today() {
   const todays = trades.filter(t => dayKey(t.date) === today)
   const status = !g ? null : g.stopLeft <= 0 ? 'stop' : g.tradesLeft <= 0 ? 'done' : g.stopLeft < (acc!.dailyLossLimit * 0.35) ? 'careful' : 'clear'
   const statusText = { clear: 'Clear to trade.', careful: 'Careful. Near your stop.', stop: 'Stopped for today.', done: 'Done for today.' }
-  const orb = status === 'clear' ? 'from-win/90 to-emerald-900' : status === 'careful' ? 'from-warn/90 to-amber-900' : 'from-loss/90 to-rose-950'
+  const ring = status === 'clear' ? ['#5b8cff', '#6ee7b7'] : status === 'careful' ? ['#ffb35c', '#ff8a7a'] : ['#ff8a7a', '#c084fc']
   const suggestedRisk = acc ? Math.min(Math.round(acc.dailyLossLimit / 3), g?.stopLeft ?? 0) : 0
 
   // Today's lane: from the daily stop up to a lock-in target (your 80th percentile green day).
@@ -65,7 +65,7 @@ export default function Today() {
   return (
     <div className="space-y-4">
       <section className="card relative overflow-hidden p-6 md:p-8">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-win/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-accent/20 blur-3xl" />
         <div className="grid gap-8 md:grid-cols-[1.2fr_1fr]">
           <div className="flex flex-col justify-center">
             <div className="label flex items-center gap-2"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-win" /> Live · {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</div>
@@ -81,9 +81,8 @@ export default function Today() {
                 <button key={a.id} onClick={() => setAccId(a.id)} className={`rounded-full border px-3 py-1 text-xs ${a.id === acc?.id ? 'border-white/70 text-white' : 'border-line text-muted'}`}>{a.name}</button>
               ))}
             </div>
-            <div className={`h-36 w-36 rounded-full bg-gradient-to-b ${orb} shadow-[0_0_80px_-10px_rgba(126,226,168,.45)]`} />
-            <div className="mt-4 label">{status}</div>
-            <div className="text-lg font-medium">{status ? statusText[status] : 'Add an account in Settings'}</div>
+            {g && acc && <Gauge pct={g.stopLeft / acc.dailyLossLimit} colors={ring} value={usd(g.stopLeft)} caption="stop left today" />}
+            <div className="mt-3 text-lg font-medium">{status ? statusText[status] : 'Add an account in Settings'}</div>
             {g && (
               <div className="mt-4 grid w-full grid-cols-4 gap-2 text-center">
                 {[['Room', usd(g.room)], ['Trades left', String(g.tradesLeft)], ['Stop left', usd(g.stopLeft)], ['Size', usd(suggestedRisk)]].map(([l, v]) => (
@@ -168,11 +167,11 @@ export default function Today() {
         </Card>
 
         <Card title="Your run · this week">
-          <div className={`font-mono text-3xl font-bold ${tone(weekTotal)}`}>{fmtUsd(weekTotal)}</div>
+          <div className={`font-mono text-3xl font-light ${tone(weekTotal)}`}>{fmtUsd(weekTotal)}</div>
           <div className="mt-4 flex h-32 items-center gap-2">
             {week.map(d => (
               <div key={d.label} className="flex h-full flex-1 flex-col items-center">
-                <div className="flex h-1/2 w-full items-end justify-center">{d.usd > 0 && <div className="w-full max-w-7 rounded-t-md bg-win/80 shadow-[0_0_20px_-4px_#7ee2a8]" style={{ height: `${(d.usd / weekMax) * 100}%` }} />}</div>
+                <div className="flex h-1/2 w-full items-end justify-center">{d.usd > 0 && <div className="w-full max-w-7 rounded-t-md bg-win/80 shadow-[0_0_20px_-4px_#6ee7b7]" style={{ height: `${(d.usd / weekMax) * 100}%` }} />}</div>
                 <div className="flex h-1/2 w-full items-start justify-center border-t border-line">{d.usd < 0 && <div className="w-full max-w-7 rounded-b-md bg-loss/80" style={{ height: `${(-d.usd / weekMax) * 100}%` }} />}</div>
               </div>
             ))}
@@ -183,6 +182,32 @@ export default function Today() {
             {last.map(t => <Link key={t.id} to={`/trades/${t.id}`} title={fmtR(rOf(t))} className={`h-2.5 w-2.5 rounded-full ${rOf(t) > 0 ? 'bg-win' : 'bg-loss'} ${t.clean ? '' : 'opacity-40'}`} />)}
           </div>
         </Card>
+      </div>
+    </div>
+  )
+}
+
+/** Thermostat-style ring: how much of today's loss budget is left. */
+function Gauge({ pct, colors, value, caption }: { pct: number; colors: string[]; value: string; caption: string }) {
+  const R = 70, C = 2 * Math.PI * R, arc = 0.75 // 270° dial
+  const p = Math.max(0, Math.min(1, pct))
+  const ticks = Array.from({ length: 41 }, (_, i) => i)
+  return (
+    <div className="relative h-48 w-48">
+      <div className="glass absolute inset-5 rounded-full" />
+      <svg viewBox="0 0 180 180" className="absolute inset-0 h-full w-full">
+        <defs><linearGradient id="gauge" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stopColor={colors[0]} /><stop offset="100%" stopColor={colors[1]} /></linearGradient></defs>
+        {ticks.map(i => {
+          const a = (135 + (i / 40) * 270) * Math.PI / 180
+          const on = i / 40 <= p
+          return <line key={i} x1={90 + Math.cos(a) * 84} y1={90 + Math.sin(a) * 84} x2={90 + Math.cos(a) * 88} y2={90 + Math.sin(a) * 88} stroke={on ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.12)'} strokeWidth="1.2" strokeLinecap="round" />
+        })}
+        <circle cx="90" cy="90" r={R} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="7" strokeDasharray={`${C * arc} ${C}`} strokeLinecap="round" transform="rotate(135 90 90)" />
+        <circle cx="90" cy="90" r={R} fill="none" stroke="url(#gauge)" strokeWidth="7" strokeDasharray={`${C * arc * p} ${C}`} strokeLinecap="round" transform="rotate(135 90 90)" style={{ filter: `drop-shadow(0 0 8px ${colors[0]})` }} />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="font-mono text-4xl font-light tracking-tight">{value}</div>
+        <div className="text-[11px] text-muted">{caption}</div>
       </div>
     </div>
   )
