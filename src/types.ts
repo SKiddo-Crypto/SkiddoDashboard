@@ -44,4 +44,5 @@ export interface Trade {
   mfeR?: number
   notes?: string
   demo?: boolean
+  source?: string // e.g. 'notion-smc' for imported trades
 }

@@ -23,12 +23,39 @@ const defaultRules: Rules = {
   focus: 'Skip C-grade setups',
 }
 
+// Personal journal exports dropped into src/data/local/*.json (gitignored) are
+// merged into the stored state on start-up: trades and accounts are matched by
+// id, so re-running an import never duplicates anything, and anything logged in
+// the app stays untouched. The first real import also removes the demo trades.
+const localImports = import.meta.glob<Partial<State>>('../data/local/*.json', { eager: true, import: 'default' })
+
+export function merge(s: State, p: Partial<State>): State {
+  const have = new Set(s.trades.map(t => t.id))
+  const incoming = (p.trades ?? []).filter(t => !have.has(t.id))
+  if (!incoming.length && !(p.accounts ?? []).some(a => !s.accounts.some(x => x.id === a.id))) return s
+  const trades = [...s.trades.filter(t => !t.demo), ...incoming].sort((a, b) => b.date.localeCompare(a.date))
+  const kept = s.accounts.filter(a => !isDemoAccount(a, s, trades))
+  const accIds = new Set(kept.map(a => a.id))
+  const accounts = [...kept, ...(p.accounts ?? []).filter(a => !accIds.has(a.id))]
+  const rules = p.rules && sameRules(s.rules, defaultRules) ? p.rules : s.rules
+  return { ...s, trades, accounts, rules }
+}
+
+function sameRules(a: Rules, b: Rules) { return a.focus === b.focus && a.plan.join('|') === b.plan.join('|') }
+// Demo accounts are only dropped while the state still holds demo trades, i.e. nobody has adopted them yet.
+function isDemoAccount(a: Account, s: State, real: Trade[]) {
+  return s.trades.some(t => t.demo) && demoAccounts.some(d => d.id === a.id) && !real.some(t => t.accountIds.includes(a.id) && !t.source)
+}
+
 function load(): State {
+  let state: State | null = null
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) state = JSON.parse(raw)
   } catch { /* storage unavailable, fall through to demo */ }
-  return { accounts: demoAccounts, trades: makeDemoTrades(), rules: defaultRules, committed: {} }
+  state ??= { accounts: demoAccounts, trades: makeDemoTrades(), rules: defaultRules, committed: {} }
+  for (const p of Object.values(localImports)) state = merge(state, p)
+  return state
 }
 
 interface Store extends State {
@@ -75,7 +102,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     accounts: s.accounts.length ? s.accounts : demoAccounts,
     trades: [...s.trades.filter(t => !t.demo), ...makeDemoTrades()].sort((a, b) => b.date.localeCompare(a.date)),
   })), [])
-  const importAll = useCallback((p: Partial<State>) => setState(s => ({ ...s, ...p })), [])
+  const importAll = useCallback((p: Partial<State>) => setState(s => merge(s, p)), [])
 
   const value = useMemo<Store>(() => ({
     ...state,
