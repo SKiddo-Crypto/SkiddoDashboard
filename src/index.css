@@ -3,18 +3,78 @@
 @tailwind utilities;
 
 :root { color-scheme: dark; }
-html, body { background: #08090a; color: #e7ecee; }
-body { font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+html { background-color: #05070d; }
+body { background: transparent; color: #eef2f8; }
+body {
+  font-family: Outfit, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+/* Backdrop: near-black with one vertical light ray and a cool haze, fixed so the
+   glass panels blur it as you scroll. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgba(96, 140, 255, 0.28), transparent 70%),
+    radial-gradient(35% 60% at 42% 25%, rgba(70, 110, 230, 0.22), transparent 70%),
+    radial-gradient(35% 60% at 58% 25%, rgba(70, 110, 230, 0.22), transparent 70%),
+    radial-gradient(55% 40% at 50% 110%, rgba(130, 170, 255, 0.18), transparent 70%),
+    linear-gradient(180deg, #070a12 0%, #05070d 100%);
+}
+/* The ray itself: a thin bright core with a wide soft bloom. */
+body::after {
+  content: '';
+  position: fixed;
+  top: -10%;
+  bottom: -10%;
+  left: 50%;
+  width: 3px;
+  margin-left: -1.5px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 18%, rgba(220,232,255,0.9) 55%, rgba(255,255,255,0) 100%);
+  box-shadow:
+    0 0 12px 2px rgba(255,255,255,0.45),
+    0 0 40px 10px rgba(130,170,255,0.35),
+    0 0 140px 50px rgba(80,120,255,0.28),
+    0 0 320px 120px rgba(60,100,230,0.14);
+  animation: ray 9s ease-in-out infinite alternate;
+}
+@keyframes ray { from { opacity: 0.75; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { body::after { animation: none; } }
+@media (max-width: 767px) { body::after { left: 72%; } }
+
+.font-mono { font-variant-numeric: tabular-nums; }
 
 @layer components {
-  .card { @apply rounded-2xl border border-line bg-panel; }
-  .label { @apply font-mono text-[10px] uppercase tracking-[0.18em] text-muted; }
-  .input { @apply w-full rounded-xl border border-line bg-panel2 px-3 py-2.5 text-sm text-white outline-none transition focus:border-win/60; }
+  .glass {
+    @apply border border-white/[0.12] bg-white/[0.05] backdrop-blur-2xl;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 20px 50px -20px rgba(0,0,0,0.55);
+  }
+  .card { @apply glass rounded-3xl; }
+  .label { @apply text-[11px] font-medium uppercase tracking-[0.14em] text-muted; }
+  .input { @apply w-full rounded-2xl border border-white/10 bg-white/[0.06] px-3.5 py-2.5 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-muted focus:border-accent/70 focus:bg-white/[0.09]; }
   .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition; }
-  .btn-primary { @apply btn bg-white text-black hover:bg-white/90; }
-  .btn-ghost { @apply btn border border-line text-soft hover:border-soft/40 hover:text-white; }
+  .btn-primary { @apply btn bg-white text-[#0b0f17] shadow-[0_8px_30px_-8px_rgba(255,255,255,0.5)] hover:bg-white/90; }
+  .btn-ghost { @apply btn border border-white/15 bg-white/[0.06] text-soft backdrop-blur-xl hover:bg-white/[0.12] hover:text-white; }
 }
 
-.glow-win { box-shadow: 0 0 0 1px rgba(126,226,168,.15), 0 30px 80px -30px rgba(126,226,168,.35); }
-.glow-loss { box-shadow: 0 0 0 1px rgba(242,118,107,.15), 0 30px 80px -30px rgba(242,118,107,.35); }
+select.input option { background: #141a26; }
+.glow-win { box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 30px 80px -30px rgba(110,231,183,.45); }
+.glow-loss { box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 30px 80px -30px rgba(255,138,122,.45); }
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* A small light ray inside a panel (Today header, trade detail). */
+.ray {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  width: 2px;
+  margin-left: -1px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 60%, rgba(255,255,255,0) 100%);
+  box-shadow: 0 0 10px 1px rgba(255,255,255,0.4), 0 0 50px 12px var(--ray, rgba(120,160,255,0.35)), 0 0 160px 60px var(--ray-wide, rgba(80,120,255,0.18));
+}

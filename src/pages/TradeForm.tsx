@@ -139,7 +139,7 @@ export default function TradeForm() {
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
           <section className={`card p-5 ${r ? (r > 0 ? 'glow-win' : 'glow-loss') : ''}`}>
             <div className="flex items-center justify-between"><div className="label">This trade</div><span className="font-mono text-xs text-muted">{t.symbol} · {t.side}</span></div>
-            <div className={`mt-2 font-mono text-5xl font-extrabold ${r > 0 ? 'text-win' : r < 0 ? 'text-loss' : 'text-muted/40'}`}>{fmtR(r)}</div>
+            <div className={`mt-2 font-mono text-5xl font-light ${r > 0 ? 'text-win' : r < 0 ? 'text-loss' : 'text-muted/40'}`}>{fmtR(r)}</div>
             <div className="mt-1 font-mono text-sm text-soft">{fmtUsd(t.resultUsd - (t.feesUsd ?? 0))} per account · {checks.length}/{CHECKLIST.length} checklist · grade {t.grade ?? '—'}</div>
             <div className="mt-5 text-[11px] text-muted">Where it lands in your record</div>
             <div className="mt-2 flex h-16 items-end gap-1">

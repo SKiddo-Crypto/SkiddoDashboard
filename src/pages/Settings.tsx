@@ -21,7 +21,7 @@ export default function Settings() {
       const data = JSON.parse(await f.text())
       if (!Array.isArray(data.trades)) throw new Error('bad file')
       s.importAll({ accounts: data.accounts ?? s.accounts, trades: data.trades, rules: data.rules ?? s.rules })
-      setMsg(`Restored ${data.trades.length} trades.`)
+      setMsg(`Imported ${data.trades.length} trades (anything already here was kept, duplicates skipped).`)
     } catch { setMsg('That file is not a Trade Ledger backup. Pick the .json file you saved with Back up.') }
   }
 
@@ -64,7 +64,7 @@ function AccountRow({ a, onChange, onDelete }: { a: Account; onChange: (a: Accou
     </label>
   )
   return (
-    <div className="rounded-xl border border-line bg-panel2/40 p-4">
+    <div className="rounded-xl border border-line bg-panel2 p-4">
       <div className="grid gap-3 sm:grid-cols-[1.4fr_1fr_auto]">
         {f('name', 'Name', 'text')}
         <label className="block">

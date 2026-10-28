@@ -6,7 +6,7 @@ import { dayKey, fmtR, fmtUsd, lc, rOf, tone } from '../lib/format'
 import { Bar as HBar, Card, Empty, Stat } from '../components/ui'
 import type { Trade } from '../types'
 
-const tip = { contentStyle: { background: '#15181a', border: '1px solid #1f2427', borderRadius: 12, fontSize: 12 }, labelStyle: { color: '#9aa3a8' } }
+const tip = { contentStyle: { background: 'rgba(16,22,34,0.88)', border: '1px solid #1f2427', borderRadius: 12, fontSize: 12 }, labelStyle: { color: '#c3cad6' } }
 
 export default function Dashboard() {
   const { trades: all, accounts } = useStore()
@@ -69,16 +69,16 @@ export default function Dashboard() {
         <div className="flex rounded-full bg-panel2 p-0.5 text-xs">
           {(['r', 'usd'] as const).map(u => <button key={u} onClick={() => setUnit(u)} className={`rounded-full px-3 py-1 ${unit === u ? 'bg-white text-black' : 'text-soft'}`}>{u === 'r' ? 'R' : '$'}</button>)}
         </div>}>
-        <div className={`font-mono text-4xl font-bold ${tone(s.netR)}`}>{unit === 'r' ? fmtR(s.netR, 1) : fmtUsd(s.netUsd)}</div>
+        <div className={`font-mono text-4xl font-light ${tone(s.netR)}`}>{unit === 'r' ? fmtR(s.netR, 1) : fmtUsd(s.netUsd)}</div>
         <div className="text-xs text-muted">{s.count} closed trades across {acc === 'all' ? accounts.length : 1} account{acc === 'all' && accounts.length !== 1 ? 's' : ''} · {s.days} trading days</div>
         <div className="mt-4 h-64">
           <ResponsiveContainer>
             <AreaChart data={curve} margin={{ left: -10, right: 0, top: 5, bottom: 0 }}>
-              <defs><linearGradient id="eq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7ee2a8" stopOpacity={0.35} /><stop offset="100%" stopColor="#7ee2a8" stopOpacity={0} /></linearGradient></defs>
-              <XAxis dataKey="i" tick={{ fill: '#6b7479', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#6b7479', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
+              <defs><linearGradient id="eq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#6ee7b7" stopOpacity={0.35} /><stop offset="100%" stopColor="#6ee7b7" stopOpacity={0} /></linearGradient></defs>
+              <XAxis dataKey="i" tick={{ fill: '#8b95a7', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#8b95a7', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
               <Tooltip {...tip} labelFormatter={(i, p) => (p?.[0] ? new Date(p[0].payload.date).toLocaleDateString('en-GB') : i)} formatter={(v: number) => (unit === 'r' ? fmtR(v) : fmtUsd(v))} />
-              <Area isAnimationActive={false} type="monotone" dataKey={unit} stroke="#7ee2a8" strokeWidth={2} fill="url(#eq)" name={unit === 'r' ? 'Net R' : 'Net $'} />
+              <Area isAnimationActive={false} type="monotone" dataKey={unit} stroke="#6ee7b7" strokeWidth={2} fill="url(#eq)" name={unit === 'r' ? 'Net R' : 'Net $'} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -100,10 +100,10 @@ export default function Dashboard() {
           <div className="h-48">
             <ResponsiveContainer>
               <BarChart data={dist} margin={{ left: -25, right: 0, top: 10, bottom: 0 }}>
-                <XAxis dataKey="label" tick={{ fill: '#6b7479', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#6b7479', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="label" tick={{ fill: '#8b95a7', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#8b95a7', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip {...tip} cursor={{ fill: '#ffffff08' }} />
-                <Bar isAnimationActive={false} dataKey="n" name="Trades" radius={[4, 4, 0, 0]}>{dist.map(d => <Cell key={d.label} fill={d.from < 0 ? '#f2766b' : '#7ee2a8'} fillOpacity={0.85} />)}</Bar>
+                <Bar isAnimationActive={false} dataKey="n" name="Trades" radius={[4, 4, 0, 0]}>{dist.map(d => <Cell key={d.label} fill={d.from < 0 ? '#ff8a7a' : '#6ee7b7'} fillOpacity={0.85} />)}</Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -113,7 +113,7 @@ export default function Dashboard() {
             {hours.map(h => (
               <div key={h.h} title={`${h.h}:00 · ${h.n} trades · ${fmtR(h.r, 1)}`}
                 className="flex aspect-square items-end justify-center rounded-md font-mono text-[9px] text-black/70"
-                style={{ background: h.n ? (h.r >= 0 ? `rgba(126,226,168,${0.15 + 0.85 * h.r / hMax})` : `rgba(242,118,107,${0.15 + 0.85 * -h.r / hMax})`) : '#15181a' }}>
+                style={{ background: h.n ? (h.r >= 0 ? `rgba(110,231,183,${0.15 + 0.85 * h.r / hMax})` : `rgba(255,138,122,${0.15 + 0.85 * -h.r / hMax})`) : 'rgba(16,22,34,0.88)' }}>
                 <span className={h.n ? '' : 'text-muted'}>{h.h}</span>
               </div>
             ))}
@@ -186,8 +186,9 @@ function RulesDonut({ trades }: { trades: Trade[] }) {
     <Card title="Rules and size">
       <div className="flex items-center gap-5">
         <svg width="88" height="88" viewBox="0 0 88 88" className="shrink-0">
-          <circle cx="44" cy="44" r="34" stroke="#15181a" strokeWidth="8" fill="none" />
-          <circle cx="44" cy="44" r="34" stroke="#e8c56b" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray={`${C * pct} ${C}`} transform="rotate(-90 44 44)" />
+          <defs><linearGradient id="donut" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#5b8cff" /><stop offset="100%" stopColor="#6ee7b7" /></linearGradient></defs>
+          <circle cx="44" cy="44" r="34" stroke="rgba(255,255,255,0.08)" strokeWidth="8" fill="none" />
+          <circle cx="44" cy="44" r="34" stroke="url(#donut)" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray={`${C * pct} ${C}`} transform="rotate(-90 44 44)" />
           <text x="44" y="49" textAnchor="middle" className="fill-white font-mono text-[15px] font-bold">{Math.round(pct * 100)}%</text>
         </svg>
         <div className="space-y-1.5 text-sm">
@@ -208,7 +209,7 @@ function EdgeBand({ lo, hi, mid }: { lo: number; hi: number; mid: number }) {
       <div className="absolute inset-x-0 top-5 h-4 rounded-full bg-gradient-to-r from-loss/30 via-panel2 to-win/20" />
       <div className="absolute top-5 h-4 w-px bg-white/40" style={{ left: x(0) }} />
       <div className="absolute top-4 h-6 rounded-full bg-win/40 blur-[1px]" style={{ left: x(lo), width: `calc(${x(hi)} - ${x(lo)})` }} />
-      <div className="absolute top-[18px] h-5 w-5 -translate-x-1/2 rounded-full bg-win shadow-[0_0_18px_#7ee2a8]" style={{ left: x(mid) }} />
+      <div className="absolute top-[18px] h-5 w-5 -translate-x-1/2 rounded-full bg-win shadow-[0_0_18px_#6ee7b7]" style={{ left: x(mid) }} />
       <div className="absolute top-11 -translate-x-1/2 font-mono text-[10px] text-muted" style={{ left: x(0) }}>0R</div>
       <div className="absolute top-0 -translate-x-1/2 font-mono text-[10px] text-win" style={{ left: x(mid) }}>{fmtR(mid)}</div>
     </div>

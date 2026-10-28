@@ -41,9 +41,9 @@ export function QuickLog({ onClose, mode = 'quick' }: { onClose: () => void; mod
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#05070c]/50 backdrop-blur-md sm:items-center" onClick={onClose}>
       <div
-        className={`w-full max-w-md rounded-t-3xl border border-line bg-panel p-5 sm:rounded-3xl ${res ? (win ? 'glow-win' : 'glow-loss') : ''}`}
+        className={`w-full max-w-md rounded-t-[32px] border border-white/15 bg-[#141a26]/70 p-5 backdrop-blur-3xl sm:rounded-[32px] ${res ? (win ? 'glow-win' : 'glow-loss') : ''}`}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
@@ -57,7 +57,7 @@ export function QuickLog({ onClose, mode = 'quick' }: { onClose: () => void; mod
           </div>
         )}
 
-        <div className={`mt-3 font-mono text-5xl font-extrabold tracking-tight ${res ? (win ? 'text-win' : 'text-loss') : 'text-muted/50'}`}>
+        <div className={`mt-3 font-mono text-5xl font-light tracking-tight ${res ? (win ? 'text-win' : 'text-loss') : 'text-muted/50'}`}>
           {fmtR(r)}
         </div>
         <div className="mt-1 flex items-center gap-2 text-sm">
@@ -105,9 +105,9 @@ export function QuickLog({ onClose, mode = 'quick' }: { onClose: () => void; mod
         <div className="mt-4 grid grid-cols-[1.3fr_1fr] gap-2">
           <label className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 ${win ? 'border-win/60' : res ? 'border-loss/60' : 'border-line'}`}>
             <span className="text-[11px] text-muted">Result</span>
-            <span className="font-mono text-xl font-bold">$</span>
+            <span className="font-mono text-xl font-medium">$</span>
             <input inputMode="decimal" autoFocus value={result} onChange={e => setResult(e.target.value.replace(/[^\d.]/g, ''))}
-              placeholder="0" className="w-full bg-transparent font-mono text-xl font-bold outline-none" />
+              placeholder="0" className="w-full bg-transparent font-mono text-xl font-medium outline-none" />
           </label>
           <label className="flex items-center gap-2 rounded-xl border border-line bg-panel2 px-3 py-2">
             <span className="text-[11px] text-muted">Risk</span>

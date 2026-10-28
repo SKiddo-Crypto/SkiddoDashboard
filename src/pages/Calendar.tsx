@@ -63,7 +63,7 @@ export default function Calendar() {
         {months.map(({ m, r, n }) => {
           const active = m.getMonth() === cursor.getMonth() && m.getFullYear() === cursor.getFullYear()
           return (
-            <button key={m.toISOString()} onClick={() => setCursor(m)} className={`flex flex-col items-center gap-1 rounded-lg py-2 ${active ? 'bg-panel2' : 'hover:bg-panel2/50'}`}>
+            <button key={m.toISOString()} onClick={() => setCursor(m)} className={`flex flex-col items-center gap-1 rounded-lg py-2 ${active ? 'bg-panel2' : 'hover:bg-panel2'}`}>
               <div className="flex h-8 items-end">{n > 0 && <div className={`w-3 rounded-sm ${r >= 0 ? 'bg-win/80' : 'bg-loss/80'}`} style={{ height: `${Math.max(3, (Math.abs(r) / mMax) * 32)}px` }} />}</div>
               <span className={`text-[10px] ${active ? 'text-white' : 'text-muted'}`}>{m.toLocaleDateString('en-GB', { month: 'short' })}</span>
             </button>
@@ -90,7 +90,7 @@ export default function Calendar() {
             const wr = wt.reduce((a, t) => a + rOf(t), 0)
             return [
               ...wk.map((d, i) => d ? <DayCell key={i} d={d} ts={days.get(dayKey(d.toISOString())) ?? []} max={dMax} selected={selected === dayKey(d.toISOString())} today={dayKey(d.toISOString()) === dayKey(now.toISOString())} onClick={() => setSelected(dayKey(d.toISOString()))} /> : <div key={i} />),
-              <div key={`w${wi}`} className="flex flex-col items-center justify-center rounded-lg bg-panel2/40 p-1">
+              <div key={`w${wi}`} className="flex flex-col items-center justify-center rounded-lg bg-panel2 p-1">
                 <span className={`font-mono text-[11px] font-bold ${tone(wr)}`}>{wt.length ? fmtR(wr, 1) : '—'}</span>
                 <span className="text-[9px] text-muted">{wt.length ? `${wt.length} tr` : ''}</span>
               </div>,
@@ -115,7 +115,7 @@ export default function Calendar() {
 function DayCell({ d, ts, max, selected, today, onClick }: { d: Date; ts: Trade[]; max: number; selected: boolean; today: boolean; onClick: () => void }) {
   const r = ts.reduce((a, t) => a + rOf(t), 0)
   const a = ts.length ? 0.08 + 0.4 * Math.min(1, Math.abs(r) / max) : 0
-  const bg = ts.length ? (r >= 0 ? `rgba(126,226,168,${a})` : `rgba(242,118,107,${a})`) : 'transparent'
+  const bg = ts.length ? (r >= 0 ? `rgba(110,231,183,${a})` : `rgba(255,138,122,${a})`) : 'transparent'
   // intraday sparkline of cumulative R
   let c = 0
   const pts = [0, ...[...ts].sort((x, y) => x.date.localeCompare(y.date)).map(t => (c += rOf(t)))]
@@ -123,10 +123,10 @@ function DayCell({ d, ts, max, selected, today, onClick }: { d: Date; ts: Trade[
   const path = pts.map((p, i) => `${(i / Math.max(1, pts.length - 1)) * 40},${14 - ((p - lo) / span) * 12}`).join(' ')
   return (
     <button onClick={onClick} style={{ background: bg }}
-      className={`relative flex aspect-[1/1.1] flex-col justify-between rounded-lg border p-1.5 text-left md:aspect-[1.4/1] md:p-2 ${selected ? 'border-white/80' : today ? 'border-win/50' : 'border-line/60'}`}>
+      className={`relative flex aspect-[1/1.1] flex-col justify-between rounded-lg border p-1.5 text-left md:aspect-[1.4/1] md:p-2 ${selected ? 'border-white/80' : today ? 'border-win/50' : 'border-line'}`}>
       <div className="flex items-start justify-between">
         <span className="font-mono text-[10px] text-muted">{d.getDate()}</span>
-        {ts.length > 1 && <svg viewBox="0 0 40 16" className="hidden h-4 w-10 md:block"><polyline points={path} fill="none" stroke={r >= 0 ? '#7ee2a8' : '#f2766b'} strokeWidth="1.2" opacity=".8" /></svg>}
+        {ts.length > 1 && <svg viewBox="0 0 40 16" className="hidden h-4 w-10 md:block"><polyline points={path} fill="none" stroke={r >= 0 ? '#6ee7b7' : '#ff8a7a'} strokeWidth="1.2" opacity=".8" /></svg>}
       </div>
       {ts.length > 0 && <span className={`font-mono text-[10px] font-bold md:text-xs ${tone(r)}`}>{fmtR(r)}</span>}
     </button>
