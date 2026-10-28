@@ -65,7 +65,8 @@ export default function Today() {
   return (
     <div className="space-y-4">
       <section className="card relative overflow-hidden p-6 md:p-8">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-accent/20 blur-3xl" />
+        <div className="ray left-[60%] hidden md:block" />
+        <div className="ray left-[50%] md:hidden" style={{ opacity: 0.6 }} />
         <div className="grid gap-8 md:grid-cols-[1.2fr_1fr]">
           <div className="flex flex-col justify-center">
             <div className="label flex items-center gap-2"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-win" /> Live · {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</div>

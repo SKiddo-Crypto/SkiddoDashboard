@@ -34,7 +34,8 @@ export default function TradeDetail() {
       </div>
 
       <section className={`card relative overflow-hidden p-6 md:p-8 ${win ? 'glow-win' : 'glow-loss'}`}
-        style={{ background: `radial-gradient(120% 140% at 0% 0%, ${win ? 'rgba(110,231,183,.10)' : 'rgba(255,138,122,.12)'}, rgba(255,255,255,0.05) 60%)` }}>
+        style={{ ['--ray' as string]: win ? 'rgba(110,231,183,0.4)' : 'rgba(255,138,122,0.4)', ['--ray-wide' as string]: win ? 'rgba(110,231,183,0.16)' : 'rgba(255,138,122,0.16)' }}>
+        <div className="ray left-[62%]" />
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${t.side === 'long' ? 'bg-win/15 text-win' : 'bg-loss/15 text-loss'}`}>{t.side === 'long' ? '▲ LONG' : '▼ SHORT'}</span>

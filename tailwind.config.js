@@ -5,7 +5,7 @@ export default {
     extend: {
       colors: {
         // Glass theme: surfaces are translucent white over a dark, glowing backdrop.
-        bg: '#0b0f17',
+        bg: "#05070d",
         panel: 'rgba(255,255,255,0.055)',
         panel2: 'rgba(255,255,255,0.07)',
         line: 'rgba(255,255,255,0.12)',
