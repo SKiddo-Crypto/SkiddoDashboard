@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { Plus, Trash2, Download, Upload } from 'lucide-react'
+import { Plus, Trash2, Download, Upload, RefreshCw } from 'lucide-react'
+import { isAddress } from '../lib/hyperliquid'
 import { useStore } from '../lib/store'
 import { uid } from '../lib/format'
 import { Card } from '../components/ui'
@@ -57,6 +58,16 @@ export default function Settings() {
 
 function AccountRow({ a, onChange, onDelete }: { a: Account; onChange: (a: Account) => void; onDelete: () => void }) {
   const [armed, setArmed] = useState(false)
+  const { syncAccount, syncing, syncError } = useStore()
+  const [syncMsg, setSyncMsg] = useState('')
+  const sync = async () => {
+    setSyncMsg('')
+    try {
+      const r = await syncAccount(a.id)
+      setSyncMsg(r.added ? `${r.added} new trade${r.added === 1 ? '' : 's'} pulled in${r.matched ? `, ${r.matched} skipped because you had already logged them` : ''}. Review them on the Trades page.` : `Up to date${r.matched ? ` (${r.matched} skipped, already logged)` : ''}.`)
+    } catch { /* syncError is shown */ }
+  }
+  const hl = a.exchange === 'Hyperliquid'
   const f = (k: keyof Account, label: string, type = 'number') => (
     <label className="block">
       <span className="mb-1 block text-[11px] text-muted">{label}</span>
@@ -79,6 +90,24 @@ function AccountRow({ a, onChange, onDelete }: { a: Account; onChange: (a: Accou
         {f('maxTradesPerDay', 'Max trades a day')}
         {f('maxDrawdown', 'Max drawdown $')}
       </div>
+      {hl && (
+        <div className="mt-3 rounded-xl border border-line bg-black/20 p-3">
+          <div className="mb-2 text-[11px] text-muted">Connect Hyperliquid · trades are pulled in automatically from your wallet's public history. Read-only, no keys needed.</div>
+          <div className="grid gap-3 sm:grid-cols-[2fr_1fr_auto]">
+            <label className="block">
+              <span className="mb-1 block text-[11px] text-muted">Wallet address</span>
+              <input type="text" placeholder="0x…" value={a.wallet ?? ''} onChange={e => onChange({ ...a, wallet: e.target.value.trim() })} className={`input font-mono ${a.wallet && !isAddress(a.wallet) ? 'border-loss/60' : ''}`} />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[11px] text-muted">Risk per trade $ (until reviewed)</span>
+              <input type="number" value={a.defaultRiskUsd ?? Math.round(a.startingBalance * 0.01)} onChange={e => onChange({ ...a, defaultRiskUsd: Number(e.target.value) })} className="input font-mono" />
+            </label>
+            <button onClick={sync} disabled={!isAddress(a.wallet ?? '') || syncing === a.id} className="btn-ghost self-end disabled:opacity-50"><RefreshCw size={14} className={syncing === a.id ? 'animate-spin' : ''} /> {syncing === a.id ? 'Syncing…' : 'Sync now'}</button>
+          </div>
+          {(syncMsg || (syncError && syncing !== a.id)) && <p className={`mt-2 text-sm ${syncMsg ? 'text-soft' : 'text-loss'}`}>{syncMsg || syncError}</p>}
+          {a.lastSync && !syncMsg && <p className="mt-2 text-[11px] text-muted">Last synced {new Date(a.lastSync).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Also runs each time you open the app.</p>}
+        </div>
+      )}
     </div>
   )
 }

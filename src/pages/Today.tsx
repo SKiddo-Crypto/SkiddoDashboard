@@ -62,8 +62,17 @@ export default function Today() {
   const last = trades.slice(0, 40).reverse()
   const stats = computeStats(trades)
 
+  const review = trades.filter(t => t.reviewed === false).length
+
   return (
     <div className="space-y-4">
+      {review > 0 && (
+        <Link to="/trades" className="card flex items-center gap-3 border-warn/40 px-5 py-3 text-sm hover:text-white">
+          <span className="h-2 w-2 rounded-full bg-warn" />
+          <span><b>{review} synced trade{review === 1 ? '' : 's'}</b> from Hyperliquid need{review === 1 ? 's' : ''} your risk, grade and notes.</span>
+          <span className="ml-auto text-sky-300">Review →</span>
+        </Link>
+      )}
       <section className="card relative overflow-hidden p-6 md:p-8">
         <div className="ray left-[60%] hidden md:block" />
         <div className="ray left-[50%] md:hidden" style={{ opacity: 0.6 }} />

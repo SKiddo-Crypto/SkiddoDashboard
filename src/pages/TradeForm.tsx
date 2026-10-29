@@ -49,7 +49,7 @@ export default function TradeForm() {
 
   const save = (again: boolean) => {
     const clean = t.mistakes?.length ? false : t.clean
-    saveTrade({ ...t, clean, session: sessionOf(t.date), demo: undefined })
+    saveTrade({ ...t, clean, session: sessionOf(t.date), demo: undefined, reviewed: t.source === 'hyperliquid' ? true : t.reviewed })
     if (again) { setT({ ...blank(), symbol: t.symbol, side: t.side, setup: t.setup, accountIds: t.accountIds }); setChecks([]) }
     else nav(`/trades/${t.id}`)
   }
@@ -57,7 +57,8 @@ export default function TradeForm() {
   return (
     <div className="space-y-4">
       <button onClick={() => nav(-1)} className="btn-ghost py-1.5"><ChevronLeft size={14} /> Back</button>
-      <h1 className="text-2xl font-semibold tracking-tight">{existing ? 'Edit trade' : 'Log a trade'}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">{existing?.reviewed === false ? 'Review synced trade' : existing ? 'Edit trade' : 'Log a trade'}</h1>
+      {existing?.reviewed === false && <p className="-mt-2 text-sm text-muted">Pulled from Hyperliquid with entry, exit, size and P&L filled in. Add your stop (or risk), grade and what you were thinking, then save.</p>}
       <p className="-mt-3 text-sm text-muted">Strategy, symbol, side and accounts carry over from your last trade.</p>
 
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">

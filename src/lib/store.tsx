@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Account, Trade } from '../types'
 import { demoAccounts, makeDemoTrades } from './demo'
+import { syncHyperliquid } from './hyperliquid'
 
 // Persistence lives behind this one module so it can be swapped for a hosted
 // database (e.g. Supabase) without touching the screens.
@@ -69,6 +70,17 @@ interface Store extends State {
   clearDemo: () => void
   loadDemo: () => void
   importAll: (s: Partial<State>) => void
+  /** Pulls closed trades from the account's Hyperliquid wallet. Resolves with what changed. */
+  syncAccount: (id: string) => Promise<{ added: number; matched: number }>
+  syncing: string | null
+  syncError: string | null
+}
+
+/** A synced trade is "the same" as one you logged by hand when symbol, side and account match and it opened within 36 hours. */
+function alreadyLogged(t: Trade, existing: Trade[]) {
+  const ts = new Date(t.date).getTime()
+  return existing.some(x => x.source !== 'hyperliquid' && !x.demo && x.symbol === t.symbol && x.side === t.side &&
+    x.accountIds.some(id => t.accountIds.includes(id)) && Math.abs(new Date(x.date).getTime() - ts) < 36 * 3600e3)
 }
 
 const Ctx = createContext<Store | null>(null)
@@ -104,11 +116,45 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   })), [])
   const importAll = useCallback((p: Partial<State>) => setState(s => merge(s, p)), [])
 
+  const [syncing, setSyncing] = useState<string | null>(null)
+  const [syncError, setSyncError] = useState<string | null>(null)
+  const syncAccount = useCallback(async (id: string) => {
+    const acc = stateRef.current.accounts.find(a => a.id === id)
+    if (!acc) throw new Error('No such account')
+    setSyncing(id); setSyncError(null)
+    try {
+      const pulled = await syncHyperliquid(acc)
+      const cur = stateRef.current
+      const have = new Set(cur.trades.map(t => t.id))
+      const fresh = pulled.filter(t => !have.has(t.id))
+      const keep = fresh.filter(t => !alreadyLogged(t, cur.trades))
+      setState(s => {
+        const ids = new Set(s.trades.map(t => t.id))
+        const trades = [...s.trades.filter(t => !t.demo), ...keep.filter(t => !ids.has(t.id))].sort((a, b) => b.date.localeCompare(a.date))
+        const accounts = s.accounts.map(a => (a.id === id ? { ...a, lastSync: new Date().toISOString() } : a))
+        return { ...s, trades, accounts }
+      })
+      return { added: keep.length, matched: fresh.length - keep.length }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Sync failed'
+      setSyncError(/fetch/i.test(msg) ? 'Could not reach Hyperliquid. Check your connection and try again.' : msg)
+      throw e
+    } finally { setSyncing(null) }
+  }, [])
+  const stateRef = useRef(state); stateRef.current = state
+
+  // Pull new trades on start-up for every account with a wallet, at most once every 10 minutes.
+  useEffect(() => {
+    for (const a of stateRef.current.accounts) {
+      if (a.wallet && (!a.lastSync || Date.now() - new Date(a.lastSync).getTime() > 10 * 60e3)) syncAccount(a.id).catch(() => {})
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const value = useMemo<Store>(() => ({
     ...state,
     isDemo: state.trades.some(t => t.demo),
-    saveTrade, deleteTrade, saveAccount, deleteAccount, setRules, toggleCommit, clearDemo, loadDemo, importAll,
-  }), [state, saveTrade, deleteTrade, saveAccount, deleteAccount, setRules, toggleCommit, clearDemo, loadDemo, importAll])
+    saveTrade, deleteTrade, saveAccount, deleteAccount, setRules, toggleCommit, clearDemo, loadDemo, importAll, syncAccount, syncing, syncError,
+  }), [state, saveTrade, deleteTrade, saveAccount, deleteAccount, setRules, toggleCommit, clearDemo, loadDemo, importAll, syncAccount, syncing, syncError])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

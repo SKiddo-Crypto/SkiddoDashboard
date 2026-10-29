@@ -14,6 +14,12 @@ export interface Account {
   maxTradesPerDay: number
   /** Max total drawdown from starting balance before the account is "blown". */
   maxDrawdown: number
+  /** Hyperliquid wallet address (0x…) used to pull trades automatically. */
+  wallet?: string
+  /** Risk assigned to synced trades until you review them. */
+  defaultRiskUsd?: number
+  /** ISO timestamp of the last successful sync. */
+  lastSync?: string
 }
 
 export interface Trade {
@@ -44,5 +50,9 @@ export interface Trade {
   mfeR?: number
   notes?: string
   demo?: boolean
-  source?: string // e.g. 'notion-smc' for imported trades
+  source?: string // e.g. 'notion-smc' for imported trades, 'hyperliquid' for synced ones
+  /** false while a synced trade still waits for you to add risk, grade and notes. */
+  reviewed?: boolean
+  /** ISO timestamp of the closing fill (synced trades). */
+  closedAt?: string
 }
