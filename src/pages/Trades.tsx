@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { ChevronDown, Download } from 'lucide-react'
 import { useStore } from '../lib/store'
 import { byDay, computeStats } from '../lib/stats'
-import { fmtR, fmtTime, fmtUsd, pnlOf, rOf, tone } from '../lib/format'
-import { Empty } from '../components/ui'
+import { fmtDate, fmtR, fmtTime, fmtUsd, pnlOf, rOf, tone } from '../lib/format'
+import { Card, Empty } from '../components/ui'
 import type { Trade } from '../types'
 
 const mondayOf = (k: string) => { const d = new Date(k + 'T12:00:00'); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d }
@@ -34,8 +34,27 @@ export default function Trades() {
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'trades.csv'; a.click()
   }
 
+  const review = trades.filter(t => t.reviewed === false)
+
   return (
     <div className="space-y-4">
+      {review.length > 0 && (
+        <Card title={`${review.length} synced trade${review.length === 1 ? '' : 's'} waiting for your review`} className="border-warn/40">
+          <p className="-mt-2 mb-3 text-sm text-muted">Pulled from Hyperliquid with the numbers filled in. Add your risk, grade and notes so the stats stay honest.</p>
+          <div className="divide-y divide-line">
+            {review.slice(0, 8).map(t => (
+              <Link key={t.id} to={`/log/${t.id}`} className="flex items-center gap-3 py-2 text-sm hover:text-white">
+                <span className="w-24 font-mono text-muted">{fmtDate(t.date)}</span>
+                <span className="w-16 font-semibold">{t.symbol}</span>
+                <span className={`w-12 text-xs ${t.side === 'long' ? 'text-win' : 'text-loss'}`}>{t.side}</span>
+                <span className={`ml-auto font-mono ${tone(pnlOf(t))}`}>{fmtUsd(pnlOf(t))}</span>
+                <span className="text-xs text-sky-300">Review →</span>
+              </Link>
+            ))}
+            {review.length > 8 && <p className="pt-2 text-xs text-muted">and {review.length - 8} more</p>}
+          </div>
+        </Card>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <h1 className="mr-auto text-2xl font-semibold tracking-tight">Trades</h1>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search symbol, setup, notes" className="input w-full sm:w-64" />
